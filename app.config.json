@@ -1,0 +1,10 @@
+{
+  "environmentUrl": "https://pxb0352d.dev.apps.dynatracelabs.com/",
+  "app": {
+    "name": "HostBusinessHours",
+    "version": "0.0.0",
+    "description": "A starting project with routing, fetching data, and charting",
+    "id": "my.host.business.hours",
+    "scopes": [{ "name": "storage:logs:read", "comment": "default template" }, { "name": "storage:buckets:read", "comment": "default template" }]
+  }
+}
