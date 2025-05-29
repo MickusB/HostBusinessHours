@@ -18,27 +18,10 @@ export const HostList = () => {
     },
   });
 
-const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>();
-
-const rowSelectionChangedListener = (
-    selectedRows: Record<string, boolean>
-    ) => {
-    console.log('selected rows:', selectedRows)
-    setSelectedRows(selectedRows)
-}
-
   return (
     <Flex width="100%" flexDirection="column" justifyContent="left" gap={2}>
-      <TitleBar>
-        <TitleBar.Title>Host List</TitleBar.Title>
-      </TitleBar>
-      <Paragraph>Select the hosts you want to define business hours for</Paragraph>
       {result.data && (
-        <DataTableV2 selectableRows onRowSelectionChange={rowSelectionChangedListener} data={result.data.records} columns={convertToColumnsV2(result.data.types)} fullWidth>
-        </DataTableV2>
-      )}
-      {result.data && (
-        <DataTableV2 selectableRows selectedRows={selectedRows} onRowSelectionChange={rowSelectionChangedListener} data={result.data.records} columns={convertToColumnsV2(result.data.types)} fullWidth>
+        <DataTableV2 selectableRows data={result.data.records} columns={convertToColumnsV2(result.data.types)} fullWidth>
         </DataTableV2>
       )}
     </Flex>
