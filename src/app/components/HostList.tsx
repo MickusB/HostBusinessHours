@@ -18,15 +18,13 @@ export const HostList = () => {
     },
   });
 
-//const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>();
+const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>();
 
 const rowSelectionChangedListener = (
     selectedRows: Record<string, boolean>
     ) => {
     console.log('selected rows:', selectedRows)
-    //const [selectedRows, setSelectedRows] = useState(currentSelectedRows);
-    //console.log('row selection obj', currentSelectedRows)
-    //setSelectedRows(currentSelectedRows)
+    setSelectedRows(selectedRows)
 }
 
   return (
@@ -36,7 +34,11 @@ const rowSelectionChangedListener = (
       </TitleBar>
       <Paragraph>Select the hosts you want to define business hours for</Paragraph>
       {result.data && (
-        <DataTableV2 selectableRows /*selectedRows={selectedRows}*/ onRowSelectionChange={rowSelectionChangedListener} data={result.data.records} columns={convertToColumnsV2(result.data.types)} fullWidth>
+        <DataTableV2 selectableRows onRowSelectionChange={rowSelectionChangedListener} data={result.data.records} columns={convertToColumnsV2(result.data.types)} fullWidth>
+        </DataTableV2>
+      )}
+      {result.data && (
+        <DataTableV2 selectableRows selectedRows={selectedRows} onRowSelectionChange={rowSelectionChangedListener} data={result.data.records} columns={convertToColumnsV2(result.data.types)} fullWidth>
         </DataTableV2>
       )}
     </Flex>
