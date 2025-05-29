@@ -4,16 +4,10 @@ import { useCurrentTheme } from "@dynatrace/strato-components/core";
 import { Flex } from "@dynatrace/strato-components/layouts";
 import { Button } from "@dynatrace/strato-components/buttons";
 import { TitleBar } from '@dynatrace/strato-components-preview/layouts';
-import {
-  Heading,
-  Paragraph,
-  Strong,
-} from "@dynatrace/strato-components/typography";
-import {
-  DataTableV2,
-} from '@dynatrace/strato-components-preview/tables';
+import { Heading, List, Paragraph, Strong, Text } from "@dynatrace/strato-components/typography";
+import { DataTableV2 } from '@dynatrace/strato-components-preview/tables';
 import { HostList } from "../components/HostList";
-import { useDqlQuery } from '@dynatrace-sdk/react-hooks';
+import { useDqlQuery, useListDocuments } from '@dynatrace-sdk/react-hooks';
 import { GET_ALL_HOSTS } from '../queries';
 import { documentsClient } from "@dynatrace-sdk/client-document";
 import { convertToColumnsV2 } from "@dynatrace/strato-components-preview/conversion-utilities";
@@ -25,6 +19,10 @@ export const Home = () => {
     },
   });
 
+  const { data, refetch } = useListDocuments({
+    filter: `type contains 'managedHostList'`,
+  });
+
   const saveHostList = async () => {
     const newDoc = selectedRows;
     const newDocBlob = new Blob([JSON.stringify(newDoc, null, 2)], {
@@ -32,7 +30,7 @@ export const Home = () => {
     });
     const data = await documentsClient.createDocument({
       body: { 
-        name: "sampleDoc1", 
+        name: "sampleDoc2", 
         type: "managedHostList", 
         content: newDocBlob  },
       });
@@ -59,6 +57,15 @@ export const Home = () => {
           <DataTableV2 selectableRows onRowSelectionChange={rowSelectionChangedListener} data={result.data.records} columns={convertToColumnsV2(result.data.types)} fullWidth>
           </DataTableV2>
         )}
+
+        <Paragraph>Managed lists</Paragraph>
+        {data && (
+        <List>
+          {data.documents.map((doc) => (
+            <Text key={doc.id}>{doc.name}</Text>
+          ))}
+        </List>
+      )}
       </Flex>
       <Button color="primary" variant="emphasized" onClick={saveHostList}>Create new managed host list</Button>
     </Flex>
