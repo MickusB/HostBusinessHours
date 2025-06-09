@@ -13,7 +13,9 @@
       { "name": "document:documents:write", "comment": "Allows to write documents" },
       { "name": "document:documents:read", "comment": "Allows to read documents" },
       { "name": "document:documents:delete", "comment": "Allows to delete documents" },
-      { "name": "document:documents:admin", "comment": "Allows admin access to documents" }
+      { "name": "document:documents:admin", "comment": "Allows admin access to documents" },
+      { "name": "app-settings:objects:read", "comment": "Allows to read app settings objects (not needed I think?)" },
+      { "name": "settings:objects:read", "comment": "Allows to read regular v2 settings objects" } 
     ]
   }
 }
