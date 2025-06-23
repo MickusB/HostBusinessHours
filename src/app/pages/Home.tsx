@@ -13,34 +13,83 @@ import { GET_ALL_HOSTS } from '../queries';
 import { documentsClient } from "@dynatrace-sdk/client-document";
 import { convertToColumnsV2 } from "@dynatrace/strato-components-preview/conversion-utilities";
 import { BlockList } from "net";
+import { TimeValue } from "@dynatrace/strato-components-preview/core";
+
+const CreateListForm = ({hosts, rowChangeListener, createDoc}) => {
+  return (
+    <>
+      <Paragraph>Select the hosts you want to define business hours for</Paragraph>
+      {hosts.data && (
+          <DataTableV2 selectableRows onRowSelectionChange={rowChangeListener} data={hosts.data.records} columns={convertToColumnsV2(hosts.data.types)} fullWidth>
+          </DataTableV2>
+        )}
+      <form action={createDoc} onSubmit={createDoc}>
+        <Flex gap={8} paddingTop={12} flexFlow="wrap">
+          <Text>Select time and frequency</Text>
+          <Text>Disable between</Text>
+            <FormField>
+              <DateTimePicker type="time" precision="minutes"></DateTimePicker> - <DateTimePicker type="time" precision="minutes"></DateTimePicker>
+            </FormField>
+          <Text>On a schedule of</Text>
+        </Flex>
+        <SelectV2>
+          <SelectV2.Content>
+            <SelectV2.Option value="daily">Daily</SelectV2.Option>
+            <SelectV2.Option value="weekly">Weekly</SelectV2.Option>
+          </SelectV2.Content>
+        </SelectV2>
+        <Button color="primary" variant="emphasized" type="submit">Create new managed host list</Button>
+      </form>
+    </>
+  )
+}
 
 export const Home = () => {
+  const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>();
+  const [schedule, setSchedule] = useState();
+
   const result = useDqlQuery({
     body: {
       query: GET_ALL_HOSTS,
     },
   });
 
-  const { data:docList, refetch:docListRefetch } = useListDocuments({
+  const { data:docList } = useListDocuments({
     filter: `type contains 'managedHostList'`,
   });
 
   const { execute } = useCreateDocument();
-  const createDoc = () => {
+  const createDoc = (event) => {
+    console.log('CREATE', event, selectedRows)
+    const contentToCreate = convertToScheduleInfo([], { "startTime": event.target[0].value, "endTime": event.target[1].value, "cadence": "Weekly"})
     execute({
       body: {
-        name: "Sample Doc 1",
+        name: `Sample Doc ${Math.floor(Math.random() * 10000)}`,
         type: "managedHostList",
-        content: new Blob([JSON.stringify(selectedRows, schedule)], {
+        content: new Blob([JSON.stringify(contentToCreate)], {
           type: 'application/json'
         })
       }
-    })
-    console.log("created doc")
+    }).then(() => { console.log("YAH") })
   }
 
-  const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>();
-  const [schedule, setSchedule] = useState();
+  interface ScheduleInfo {
+    hosts: [],
+    startTime: Date,
+    endTime: Date,
+    cadence: string
+  }
+
+  const convertToScheduleInfo = (hosts, schedule) => {
+    const objectOut = {
+      "hosts": [0],
+      "startTime": new Date(schedule.startTime).getHours(),
+      "endTime": new Date(schedule.endTime).getHours(),
+      "cadence": schedule.cadence
+    }
+    console.log(objectOut)
+    return objectOut
+  }
   
   const rowSelectionChangedListener = (
       selectedRows: Record<string, boolean>
@@ -53,36 +102,13 @@ export const Home = () => {
   return (
     <Flex flexDirection="column" alignItems="normal" padding={2}>
       <Heading>Host Business Hours</Heading>
+      <CreateListForm hosts={result} rowChangeListener={rowSelectionChangedListener} createDoc={createDoc}/>
       <Flex gap={8} paddingTop={12} flexFlow="wrap">
-        <form>
-          <Paragraph>Select the hosts you want to define business hours for</Paragraph>
-            {result.data && (
-              <DataTableV2 selectableRows onRowSelectionChange={rowSelectionChangedListener} data={result.data.records} columns={convertToColumnsV2(result.data.types)} fullWidth>
-              </DataTableV2>
-            )}
-            <Flex gap={8} paddingTop={12} flexFlow="wrap">
-              <Text>Select time and frequency</Text>
-              <Text>Disable between</Text>
-              
-                <FormField>
-                  <DateTimePicker type="time" precision="minutes"></DateTimePicker> - <DateTimePicker type="time" precision="minutes"></DateTimePicker>
-                </FormField>
-              
-              <Text>On a schedule of</Text>
-            </Flex>
-          <SelectV2>
-          <SelectV2.Content>
-            <SelectV2.Option value="daily">Daily</SelectV2.Option>
-            <SelectV2.Option value="weekly">Weekly</SelectV2.Option>
-          </SelectV2.Content>
-        </SelectV2>
-        <Button color="primary" variant="emphasized" type="submit" onClick={createDoc}>Create new managed host list</Button>
-      </form>
       <Paragraph>Managed lists</Paragraph>
         {docList && (
           <List>
             {docList.documents.map((doc) => (
-              <Text key={doc.id}>{doc.name}</Text>
+              <Text key={doc.id}>{doc.id} {doc.name}</Text>
             ))}
           </List>
         )}

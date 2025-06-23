@@ -13,7 +13,7 @@ export const App = () => {
       </Page.Header>
       <Page.Main>
         <Routes>
-          <Route path="/" element={<Scheduler />} />
+          <Route path="/" element={<Home />} />
           <Route path="scheduler" element={<Scheduler/>}/>
         </Routes>
       </Page.Main>
