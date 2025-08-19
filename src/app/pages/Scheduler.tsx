@@ -39,8 +39,8 @@ export const Scheduler = () => {
             ))}
           </Text>
         )}
-        <Button onClick={getObjs}>Button text</Button>
-        <Button onClick={updateObj}>Button text</Button>
+        <Button onClick={getObjs}>Get objects</Button>
+        <Button onClick={updateObj}>Update objects</Button>
     </Flex>
   );
 }

@@ -14,7 +14,7 @@ export const App = () => {
       <Page.Main>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="scheduler" element={<Scheduler/>}/>
+          <Route path="/scheduler" element={<Scheduler/>}/>
         </Routes>
       </Page.Main>
     </Page>

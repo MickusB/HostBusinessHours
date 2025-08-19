@@ -20,10 +20,10 @@ const CreateListForm = ({hosts, rowChangeListener, createDoc}) => {
     <>
       <Paragraph>Select the hosts you want to define business hours for</Paragraph>
       {hosts.data && (
-          <DataTableV2 selectableRows onRowSelectionChange={rowChangeListener} data={hosts.data.records} columns={convertToColumnsV2(hosts.data.types)} fullWidth>
-          </DataTableV2>
-        )}
-      <form action={createDoc} onSubmit={createDoc}>
+        <DataTableV2 selectableRows onRowSelectionChange={rowChangeListener} data={hosts.data.records} columns={convertToColumnsV2(hosts.data.types)} fullWidth>
+        </DataTableV2>
+      )}
+      <form onSubmit={createDoc}>
         <Flex gap={8} paddingTop={12} flexFlow="wrap">
           <Text>Select time and frequency</Text>
           <Text>Disable between</Text>
@@ -38,6 +38,10 @@ const CreateListForm = ({hosts, rowChangeListener, createDoc}) => {
             <SelectV2.Option value="weekly">Weekly</SelectV2.Option>
           </SelectV2.Content>
         </SelectV2>
+        <Text>Host list name</Text>
+        <FormField>
+          <TextInput placeholder="Host list name"></TextInput>
+        </FormField>
         <Button color="primary" variant="emphasized" type="submit">Create new managed host list</Button>
       </form>
     </>
@@ -48,11 +52,73 @@ export const Home = () => {
   const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>();
   const [schedule, setSchedule] = useState();
 
-  const result = useDqlQuery({
+  /*const result = useDqlQuery({
     body: {
       query: GET_ALL_HOSTS,
     },
   });
+
+  setTimeout(() => { console.log(result!.data?.records)}, 5000)*/
+  
+  //mocked data
+  const result = {
+    "data": {
+        "records": [
+            {
+                "entity.name": "Sample Host",
+                "id": "HOST-16FAEdddddF99D13"
+            },
+            {
+                "entity.name": "Host of Sample",
+                "id": "HOST-16FAeeeeeBF99D13"
+            },
+            {
+                "entity.name": "1 Host that is Sampled",
+                "id": "HOST-16FAcccccBF99D13"
+            }
+        ],
+        "types": [
+            {
+                "indexRange": [
+                    0,
+                    0
+                ],
+                "mappings": {
+                    "entity.name": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string"
+                    }
+                }
+            }
+        ],
+        "metadata": {
+            "grail": {
+                "canonicalQuery": "fetch dt.entity.host, from:-30d",
+                "timezone": "Z",
+                "query": "fetch dt.entity.host, from:-30d",
+                "scannedRecords": 1,
+                "dqlVersion": "V1_0",
+                "scannedBytes": 0,
+                "scannedDataPoints": 0,
+                "analysisTimeframe": {
+                    "start": "2025-07-20T08:38:39.913Z",
+                    "end": "2025-08-19T08:38:39.913Z"
+                },
+                "locale": "und",
+                "executionTimeMilliseconds": 35,
+                "notifications": [],
+                "queryId": "3c99f8f3-6e29-4162-a893-814ff865f81d",
+                "sampled": false
+            }
+        }
+    },
+    "isError": false,
+    "isLoading": false,
+    "isSuccess": true,
+    "status": "success"
+  }
 
   const { data:docList } = useListDocuments({
     filter: `type contains 'managedHostList'`,
@@ -60,41 +126,46 @@ export const Home = () => {
 
   const { execute } = useCreateDocument();
   const createDoc = (event) => {
-    console.log('CREATE', event, selectedRows)
-    const contentToCreate = convertToScheduleInfo([], { "startTime": event.target[0].value, "endTime": event.target[1].value, "cadence": "Weekly"})
+    let selectedIndices = Object.keys(selectedRows!).map(index => parseInt(index))
+    const contentToCreate = convertToScheduleInfo(selectedIndices.map(index => result.data.records[index]), { "startTime": event.target[0].value, "endTime": event.target[1].value, "cadence": "Weekly"})
     execute({
       body: {
-        name: `Sample Doc ${Math.floor(Math.random() * 10000)}`,
+        name: event.target[4].value,
         type: "managedHostList",
         content: new Blob([JSON.stringify(contentToCreate)], {
           type: 'application/json'
         })
       }
-    }).then(() => { console.log("YAH") })
+    })
   }
 
-  interface ScheduleInfo {
-    hosts: [],
-    startTime: Date,
-    endTime: Date,
-    cadence: string
+  interface Host {
+    name: string,
+    id: string
+  }
+
+  interface HostList {
+    hosts: Array<Host>,
+    schedule: {
+      startTime: Number,
+      endTime: Number,
+      cadence: string
+    }
   }
 
   const convertToScheduleInfo = (hosts, schedule) => {
-    const objectOut = {
-      "hosts": [0],
-      "startTime": new Date(schedule.startTime).getHours(),
-      "endTime": new Date(schedule.endTime).getHours(),
-      "cadence": schedule.cadence
+    const objectOut:HostList = {
+      "hosts": hosts,
+      "schedule": {
+        "startTime": new Date(schedule.startTime).getHours(),
+        "endTime": new Date(schedule.endTime).getHours(),
+        "cadence": schedule.cadence
+      }
     }
-    console.log(objectOut)
     return objectOut
   }
   
-  const rowSelectionChangedListener = (
-      selectedRows: Record<string, boolean>
-      ) => {
-      console.log('selected rows:', selectedRows)
+  const rowSelectionChangedListener = (selectedRows: Record<string, boolean>) => {
       setSelectedRows(selectedRows)
   }
 
@@ -113,7 +184,6 @@ export const Home = () => {
           </List>
         )}
       </Flex>
-      
     </Flex>
   );
   }

@@ -17,7 +17,6 @@ export const HostList = () => {
       query: GET_ALL_HOSTS,
     },
   });
-
   return (
     <Flex width="100%" flexDirection="column" justifyContent="left" gap={2}>
       {result.data && (
