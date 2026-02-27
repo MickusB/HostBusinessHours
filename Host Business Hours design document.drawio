@@ -1,0 +1,25 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36" version="29.5.3">
+  <diagram name="Page-1" id="Y7h09lf8bdc_T5C0NdNw">
+    <mxGraphModel dx="1234" dy="795" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="QjzcUeHo5P_d6ttB2jZM-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=light-dark(#FFFFFF,#FFFFFF);align=left;horizontal=1;verticalAlign=top;" value="&lt;font style=&quot;font-size: 16px; color: light-dark(rgb(0, 0, 0), rgb(26, 26, 26));&quot;&gt;&lt;b&gt;Host List Page&lt;/b&gt;&lt;/font&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;&lt;font style=&quot;color: light-dark(rgb(26, 26, 26), rgb(0, 0, 0));&quot;&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;D&lt;/font&gt;&lt;font size=&quot;1&quot;&gt;isplay all &quot;managed host lists&quot;&lt;/font&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font size=&quot;1&quot; style=&quot;color: light-dark(rgb(26, 26, 26), rgb(0, 0, 0));&quot;&gt;Allow creation of new managed host lists&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font size=&quot;1&quot; style=&quot;color: light-dark(rgb(26, 26, 26), rgb(0, 0, 0));&quot;&gt;Show detail view of host lists in dropdown&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font size=&quot;1&quot; style=&quot;color: light-dark(rgb(26, 26, 26), rgb(0, 0, 0));&quot;&gt;Create a workflow representing the schedule information and host IDs&lt;/font&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="170" width="356" x="354" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="QjzcUeHo5P_d6ttB2jZM-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=light-dark(#FFFFFF,#FFFFFF);align=left;horizontal=1;verticalAlign=top;" value="&lt;font style=&quot;color: light-dark(rgb(0, 0, 0), rgb(0, 0, 0));&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;span style=&quot;font-size: 16px;&quot;&gt;&lt;b style=&quot;&quot;&gt;Workflow&lt;/b&gt;&lt;/span&gt;&lt;/font&gt;&lt;br&gt;&lt;/font&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;&lt;font style=&quot;&quot;&gt;&lt;font style=&quot;font-size: 14px; color: light-dark(rgb(0, 0, 0), rgb(0, 0, 0));&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font style=&quot;color: light-dark(rgb(0, 0, 0), rgb(0, 0, 0));&quot;&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;Input contains a list of settings objects and host IDs from the managed host list&lt;/span&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font style=&quot;color: light-dark(rgb(0, 0, 0), rgb(0, 0, 0));&quot;&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;If &quot;operation&quot; property in input is &quot;enable&quot;, enable all hosts, otherwise, disable&lt;/span&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font style=&quot;color: light-dark(rgb(0, 0, 0), rgb(0, 0, 0));&quot;&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;Post an event detailing the run&lt;/span&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font size=&quot;1&quot; style=&quot;color: light-dark(rgb(26, 26, 26), rgb(0, 0, 0));&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="170" width="356" x="354" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="QjzcUeHo5P_d6ttB2jZM-4" edge="1" parent="1" source="QjzcUeHo5P_d6ttB2jZM-1" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="QjzcUeHo5P_d6ttB2jZM-2" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="390" y="380" as="sourcePoint" />
+            <mxPoint x="440" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QjzcUeHo5P_d6ttB2jZM-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=light-dark(#FFFFFF,#FFFFFF);align=left;horizontal=1;verticalAlign=top;" value="&lt;b style=&quot;color: light-dark(rgb(0, 0, 0), rgb(0, 0, 0)); font-size: 16px; background-color: transparent;&quot;&gt;Some considerations&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;color: light-dark(rgb(0, 0, 0), rgb(0, 0, 0)); background-color: transparent; font-size: 14px;&quot;&gt;Creating monitoring settings objects on every host makes it difficult to turn off monitoring for a host group later, since the host-level object takes priority&lt;/font&gt;&lt;font style=&quot;color: light-dark(rgb(0, 0, 0), rgb(0, 0, 0)); background-color: transparent; font-size: 16px;&quot;&gt;.&lt;/font&gt;" vertex="1">
+          <mxGeometry height="200" width="270" x="50" y="300" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

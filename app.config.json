@@ -1,22 +1,59 @@
 {
+  "$schema": "./.dt-app/app.config.schema.json",
   "environmentUrl": "https://pxb0352d.dev.apps.dynatracelabs.com/",
+  "build": {
+    "sourceRoot": "./"
+  },
   "app": {
     "name": "HostBusinessHours",
     "version": "0.0.0",
     "description": "A starting project with routing, fetching data, and charting",
     "id": "my.host.business.hours",
     "scopes": [
-      { "name": "storage:logs:read", "comment": "default template" }, 
-      { "name": "storage:buckets:read", "comment": "default template" },
-      { "name": "storage:metrics:read", "comment": "Allows to read metrics" },
-      { "name": "storage:entities:read", "comment": "Allows to read entities" },
-      { "name": "document:documents:write", "comment": "Allows to write documents" },
-      { "name": "document:documents:read", "comment": "Allows to read documents" },
-      { "name": "document:documents:delete", "comment": "Allows to delete documents" },
-      { "name": "document:documents:admin", "comment": "Allows admin access to documents" },
-      { "name": "app-settings:objects:read", "comment": "Allows to read app settings objects (not needed I think?)" },
-      { "name": "settings:objects:read", "comment": "Allows to read regular v2 settings objects" },
-      { "name": "settings:objects:write", "comment": "Allows to write regular v2 settings objects" }
+      {
+        "name": "storage:logs:read",
+        "comment": "default template"
+      },
+      {
+        "name": "storage:buckets:read",
+        "comment": "default template"
+      },
+      {
+        "name": "storage:metrics:read",
+        "comment": "Allows to read metrics"
+      },
+      {
+        "name": "storage:entities:read",
+        "comment": "Allows to read entities"
+      },
+      {
+        "name": "document:documents:write",
+        "comment": "Allows to write documents"
+      },
+      {
+        "name": "document:documents:read",
+        "comment": "Allows to read documents"
+      },
+      {
+        "name": "document:documents:delete",
+        "comment": "Allows to delete documents"
+      },
+      {
+        "name": "document:documents:admin",
+        "comment": "Allows admin access to documents"
+      },
+      {
+        "name": "app-settings:objects:read",
+        "comment": "Allows to read app settings objects (not needed I think?)"
+      },
+      {
+        "name": "settings:objects:read",
+        "comment": "Allows to read regular v2 settings objects"
+      },
+      {
+        "name": "settings:objects:write",
+        "comment": "Allows to write regular v2 settings objects"
+      }
     ]
   }
 }
