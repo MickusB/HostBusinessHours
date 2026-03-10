@@ -1,18 +1,20 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
+import { Controller, useForm } from 'react-hook-form';
 import { GET_ALL_HOSTS } from '../queries';
 import { DataTable, convertToColumns } from '@dynatrace/strato-components-preview/tables';
+import type { TimeValue } from '@dynatrace/strato-components-preview/core';
 import { Button, Flex, Heading, List, Paragraph, Text } from "@dynatrace/strato-components";
 import type { QueryResult } from '@dynatrace-sdk/client-query';
-import { FormField, DateTimePicker, Select, TextInput } from "@dynatrace/strato-components-preview";
-import { useCreateDocument } from "@dynatrace-sdk/react-hooks";
+import { FormField, DateTimePicker, Select, TextInput, DateTimePickerProps } from "@dynatrace/strato-components-preview";
+import { useCreateDocument, useSettingsObjectsV2 } from "@dynatrace-sdk/react-hooks";
 
 interface Host {
     id: string,
     name: string,
-    settingsObjectId: string
+    settingsObjectId?: string
   }
 
-interface HostList {
+interface BusinessHours {
   hosts: Array<Host>,
   schedule: {
     startTime: Number,
@@ -59,12 +61,51 @@ const result: QueryResult = {
     ],
     "metadata": {}
   }
-/*
-const CreateBusinessHours = () => {
+
+const BusinessHoursWorkflow = () => {
+  const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>();
+  const [isCreating, setIsCreating] = useState(false)
+  const [hostListData, setHostListData] = useState()
+
+  return (
+    <>
+      <HostList rowSelectionListener={setSelectedRows}></HostList>
+      <BusinessHoursForm onSubmit={(data) => {
+        setHostListData(data)
+        setIsCreating(true)
+      }}>
+      </BusinessHoursForm>
+        {isCreating && (
+            <CreateBusinessHours selectedRows={selectedRows} hostListData={hostListData}></CreateBusinessHours>
+        )}
+    </>
+  )
+}
+
+const CreateBusinessHours = ({ selectedRows, hostListData }) => {
+
+    //const settingsObjects = useSettingsObjectsV2({ scope:  })
+
+    const convertHostData = (hostsToConvert) => {
+        let hosts: Array<Host>
+        // Keys of selectedRows are stored as strings, so need to convert
+        const selectedIndices = Object.keys(selectedRows).map(index => parseInt(index))
+        const rawHostData = selectedIndices.map(index => result.records[index])
+    }
+    
+    const convertScheduleData = (schedule) => {
+      
+    }
+    
+    const convertToBusinessHours = () => {
+
+    }
+
     const { execute } = useCreateDocument()
-      const createDoc = (event) => {
+    /*  
+    const createDoc = (event) => {
         let selectedIndices = Object.keys(selectedRows!).map(index => parseInt(index))
-        const contentToCreate = createHostList(selectedIndices.map(index => hosts[index]), { "startTime": event.target[0].value, "endTime": event.target[1].value, "cadence": "Weekly"})
+        //const contentToCreate = createHostList(selectedIndices.map(index => hosts[index]), { "startTime": event.target[0].value, "endTime": event.target[1].value, "cadence": "Weekly"})
         //let objectIds = getObjs(contentToCreate.hosts)
     
         execute({
@@ -77,32 +118,48 @@ const CreateBusinessHours = () => {
           }
         })
       }
-}
 */
-const BusinessHoursForm = ({ setIsCreating }) => {
-    return (<>
-        <form onSubmit={() => setIsCreating(true)}>
-          <Flex gap={8} paddingTop={12} flexFlow="wrap">
-            <Text>Select time and frequency</Text>
-            <Text>Disable between</Text>
-              <FormField>
-                <DateTimePicker type="time" precision="minutes"></DateTimePicker> - <DateTimePicker type="time" precision="minutes"></DateTimePicker>
-              </FormField>
-            <Text>On a schedule of</Text>
-          </Flex>
-          <Select>
-            <Select.Content>
-              <Select.Option value="daily">Daily</Select.Option>
-              <Select.Option value="weekly">Weekly</Select.Option>
-            </Select.Content>
-          </Select>
-          <Text>Host list name</Text>
-          <FormField>
-            <TextInput placeholder="Host list name"></TextInput>
-          </FormField>
-          <Button color="primary" variant="emphasized" type="submit">Create new managed host list</Button>
-        </form>
-      </>)
+    return (
+        <>
+
+        </>
+    )
+}
+
+const BusinessHoursForm = ({ onSubmit }) => {
+  const [startTime, setStartTime] = useState<DateTimePickerProps['value']>(() => new Date().toISOString());
+  const [endTime, setEndTime] = useState<DateTimePickerProps['value']>(() => new Date().toISOString());
+  const [cadence, setCadence] = useState<"daily" | "weekly">()
+  const [name, setName] = useState("")
+
+  const handleSubmit = (event) => { 
+    event.preventDefault()
+    onSubmit({ startTime, endTime, cadence, name })
+  }
+
+  return (<>
+      <form onSubmit={(event) => handleSubmit(event)}>
+        <Flex gap={8} paddingTop={12} flexFlow="wrap">
+          <Text>Select time and frequency</Text>
+          <Text>Disable between</Text>
+            <FormField>
+              <DateTimePicker type="time" precision="minutes" value={startTime} onChange={(time) => setStartTime(time!["value"])}></DateTimePicker> - <DateTimePicker type="time" precision="minutes" value={endTime} onChange={(time) => setEndTime(time!["value"])}></DateTimePicker>
+            </FormField>
+          <Text>On a schedule of</Text>
+        </Flex>
+        <Select name="cadence-select" value={cadence} onChange={setCadence}>
+          <Select.Content>
+            <Select.Option value="daily">Daily</Select.Option>
+            <Select.Option value="weekly">Weekly</Select.Option>
+          </Select.Content>
+        </Select>
+        <Text>Host list name</Text>
+        <FormField>
+          <TextInput placeholder="Host list name" value={name} onChange={(text) => setName(text)}></TextInput>
+        </FormField>
+        <Button color="primary" variant="emphasized" type="submit">Create new managed host list</Button>
+      </form>
+    </>)
 }
 
 
@@ -117,17 +174,9 @@ const HostList = ({ rowSelectionListener }) => {
 }
 
 export const Create = () => {
-    const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>();
-    const [isCreating, setIsCreating] = useState(false)
 
-    return(
-        <>
-            <Heading>Select hosts and their business schedule</Heading>
-            <HostList rowSelectionListener={setSelectedRows}></HostList>
-            <BusinessHoursForm setIsCreating={setIsCreating}></BusinessHoursForm>
-            {isCreating && (
-                <h1>Creando...</h1>
-            )}
-        </>
-    )
+    return(<>
+        <Heading>Select hosts and their business schedule</Heading>
+        <BusinessHoursWorkflow></BusinessHoursWorkflow>
+    </>)
 }
