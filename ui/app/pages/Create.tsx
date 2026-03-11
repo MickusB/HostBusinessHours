@@ -125,27 +125,33 @@ const CreateBusinessHours = ({ selectedRows, hostListData }) => {
     })
   )
 
+  const contentToCreate: BusinessHours = {
+    hosts: hosts,
+    schedule: {
+      startTime: hostListData.startTime,
+      endTime: hostListData.endTime,
+      cadence: hostListData.cadence
+    }
+  }
+
   // Use this to get live data
   //const settingsObjects = DocumentService.getSettings({ schemaIds: "builtin:host.monitoring", fields: "objectId,scope", scope: hostNames}).then(object => console.log(object))
 
-  //const { execute } = useCreateDocument()
-  /*  
-  const createDoc = (event) => {
-      let selectedIndices = Object.keys(selectedRows!).map(index => parseInt(index))
-      //const contentToCreate = createHostList(selectedIndices.map(index => hosts[index]), { "startTime": event.target[0].value, "endTime": event.target[1].value, "cadence": "Weekly"})
-      //let objectIds = getObjs(contentToCreate.hosts)
-  
-      execute({
-        body: {
-          name: event.target[4].value,
-          type: "managedHostList",
-          content: new Blob([JSON.stringify(contentToCreate)], {
-            type: 'application/json'
-          })
-        }
-      })
-    }
-*/
+  const { execute } = useCreateDocument()
+
+  useEffect(() => {
+    console.log("doing stuff!")
+    execute({
+      body: {
+        name: hostListData.name,
+        type: "managedHostList",
+        content: new Blob([JSON.stringify(contentToCreate)], {
+          type: 'application/json'
+        })
+      }
+    })
+  }, [])
+    
   return (
       <>
 
