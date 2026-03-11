@@ -4,15 +4,17 @@ import { GET_ALL_HOSTS } from '../queries';
 import { DataTable, convertToColumns } from '@dynatrace/strato-components-preview/tables';
 import type { TimeValue } from '@dynatrace/strato-components-preview/core';
 import { Button, Flex, Heading, List, Paragraph, Text } from "@dynatrace/strato-components";
-import type { QueryResult } from '@dynatrace-sdk/client-query';
+import type { QueryResult, ResultRecord } from '@dynatrace-sdk/client-query';
 import { FormField, DateTimePicker, Select, TextInput, DateTimePickerProps } from "@dynatrace/strato-components-preview";
-import { useCreateDocument, useSettingsObjectsV2 } from "@dynatrace-sdk/react-hooks";
+import { useCreateDocument } from "@dynatrace-sdk/react-hooks";
+import DocumentService from "../services/DocumentService"
 
-interface Host {
-    id: string,
-    name: string,
-    settingsObjectId?: string
-  }
+// Type here is functionally the same as a result record, just with one extra property.
+type Host = ResultRecord & {
+  id: string
+  "entity.name": string
+  settingsObjectId?: string
+}
 
 interface BusinessHours {
   hosts: Array<Host>,
@@ -63,7 +65,7 @@ const result: QueryResult = {
   }
 
 const BusinessHoursWorkflow = () => {
-  const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>();
+  const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
   const [isCreating, setIsCreating] = useState(false)
   const [hostListData, setHostListData] = useState()
 
@@ -83,47 +85,72 @@ const BusinessHoursWorkflow = () => {
 }
 
 const CreateBusinessHours = ({ selectedRows, hostListData }) => {
+  //mocked sample response from get settings API
+  const settingsObjects = {
+    "items": [
+        {
+          "objectId": "vu9U3hXa3q0AAAAAAAAAdidWlsdGluOmhvc3QubW9uaXRvcmluZwAESE9TVAAQMTZGQUVFOEU3QkY5OUQxMwAkNTJiZWNlNzItMDJiOC0zOWE1LWI0NzctM2MxOWNiZDEzZjk1vu9U3hXa3q0",
+          "scope": "HOST-16FAeeeeeBF99D13"
+          //matches host 1
+        }, {
+          "objectId": "vu9U3hXa3q0BBBBBBBBBdidWlsdGluOmhvc3QubW9uaXRvcmluZwAESE9TVAAQMTZGQUVFOEU3QkY5OUQxMwAkNTJiZWNlNzItMDJiOC0zOWE1LWI0NzctM2MxOWNiZDEzZjk1vu9U3hXa3q0",
+          "scope": "HOST-16FAcccccBF99D13"
+          //matches host 2
+        }, {
+          "objectId": "vu9U3hXa3q0CCCCCCCCCdidWlsdGluOmhvc3QubW9uaXRvcmluZwAESE9TVAAQMTZGQUVFOEU3QkY5OUQxMwAkNTJiZWNlNzItMDJiOC0zOWE1LWI0NzctM2MxOWNiZDEzZjk1vu9U3hXa3q0",
+          "scope": "HOST-16FAzzzzzBF99D13"
+          //matches host 4
+        }
+    ],
+    "totalCount": 3,
+    "pageSize": 100
+  }
+  // Map each object ID to its scope
+  const settingsMapping = new Map(settingsObjects.items.map(setting => [setting.scope, setting.objectId]))
 
-    //const settingsObjects = useSettingsObjectsV2({ scope:  })
+  // Keys of selectedRows are stored as strings, so need to convert
+  const selectedIndices = Object.keys(selectedRows).map(index => parseInt(index))
 
-    const convertHostData = (hostsToConvert) => {
-        let hosts: Array<Host>
-        // Keys of selectedRows are stored as strings, so need to convert
-        const selectedIndices = Object.keys(selectedRows).map(index => parseInt(index))
-        const rawHostData = selectedIndices.map(index => result.records[index])
+  // Results are stored in ResultRecord object. Settings object ID needs to be added to this record, so intersectional host
+  // type is used here to map ResultRecord to Host
+  let hosts = selectedIndices.map(index => { return result.records[index] as Host})
+
+  // Formats host names to correct format for "scope" parameter of getSettings later
+  const hostNames = hosts.map(host => { return host["entity.name"] }).join(", ")
+
+  // Overwrite hosts with a copy of itself but with the corresponding object ID added to each host
+  hosts = hosts.map(host => ({
+      ...host,
+      settingsObjectId: settingsMapping.get(host.id)
+    })
+  )
+
+  // Use this to get live data
+  //const settingsObjects = DocumentService.getSettings({ schemaIds: "builtin:host.monitoring", fields: "objectId,scope", scope: hostNames}).then(object => console.log(object))
+
+  //const { execute } = useCreateDocument()
+  /*  
+  const createDoc = (event) => {
+      let selectedIndices = Object.keys(selectedRows!).map(index => parseInt(index))
+      //const contentToCreate = createHostList(selectedIndices.map(index => hosts[index]), { "startTime": event.target[0].value, "endTime": event.target[1].value, "cadence": "Weekly"})
+      //let objectIds = getObjs(contentToCreate.hosts)
+  
+      execute({
+        body: {
+          name: event.target[4].value,
+          type: "managedHostList",
+          content: new Blob([JSON.stringify(contentToCreate)], {
+            type: 'application/json'
+          })
+        }
+      })
     }
-    
-    const convertScheduleData = (schedule) => {
-      
-    }
-    
-    const convertToBusinessHours = () => {
-
-    }
-
-    const { execute } = useCreateDocument()
-    /*  
-    const createDoc = (event) => {
-        let selectedIndices = Object.keys(selectedRows!).map(index => parseInt(index))
-        //const contentToCreate = createHostList(selectedIndices.map(index => hosts[index]), { "startTime": event.target[0].value, "endTime": event.target[1].value, "cadence": "Weekly"})
-        //let objectIds = getObjs(contentToCreate.hosts)
-    
-        execute({
-          body: {
-            name: event.target[4].value,
-            type: "managedHostList",
-            content: new Blob([JSON.stringify(contentToCreate)], {
-              type: 'application/json'
-            })
-          }
-        })
-      }
 */
-    return (
-        <>
+  return (
+      <>
 
-        </>
-    )
+      </>
+  )
 }
 
 const BusinessHoursForm = ({ onSubmit }) => {

@@ -1,4 +1,4 @@
-import { ObjectsList, settingsObjectsClient } from "@dynatrace-sdk/client-classic-environment-v2";
+import { settingsObjectsClient } from "@dynatrace-sdk/client-classic-environment-v2";
 
 const getSettings = async (config) => await settingsObjectsClient.getSettingsObjects(config)
 
