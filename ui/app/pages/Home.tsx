@@ -6,6 +6,7 @@ import { Heading, List, Paragraph, Strong, Text } from "@dynatrace/strato-compon
 import { DataTable, DataTableColumnDef, convertToColumns } from '@dynatrace/strato-components-preview/tables';
 import { useListDocuments } from '@dynatrace-sdk/react-hooks';
 import { DocumentList } from "@dynatrace-sdk/client-document";
+import { workflowsClient } from "@dynatrace-sdk/client-automation";
 
   type BusinessHoursListRow = 
   NonNullable<DocumentList>["documents"][number];
@@ -14,6 +15,10 @@ export const Home = () => {
   const { data:businessHoursLists } = useListDocuments({
     filter: `type contains 'managedHostList'`,
   })
+
+  const createWorkflow = async () => await workflowsClient.createWorkflow({
+    body: { title: "...", throttle: { isLimitHit: false } },
+  });
 
   const columns = useMemo<DataTableColumnDef<BusinessHoursListRow>[]>(() => [
     { id: "id", accessor: "id", header: "ID" },
@@ -29,6 +34,7 @@ export const Home = () => {
           <DataTable data={businessHoursLists.documents} columns={columns}/>
         }
       </Flex>
+      <button onClick={createWorkflow}>Create workflow</button>
     </Flex>
   );
 }

@@ -44,7 +44,7 @@
       },
       {
         "name": "app-settings:objects:read",
-        "comment": "Allows to read app settings objects (not needed I think?)"
+        "comment": "Allows to read app settings objects"
       },
       {
         "name": "settings:objects:read",
@@ -53,6 +53,38 @@
       {
         "name": "settings:objects:write",
         "comment": "Allows to write regular v2 settings objects"
+      },
+      {
+        "name": "automation:workflows:write",
+        "comment": ""
+      },
+      {
+        "name": "automation:workflows:read",
+        "comment": ""
+      },
+      {
+        "name": "automation:workflows:run",
+        "comment": ""
+      },
+      {
+        "name": "automation:workflows:admin",
+        "comment": ""
+      },
+      {
+        "name": "automation:rules:read",
+        "comment": ""
+      },
+      {
+        "name": "automation:rules:write",
+        "comment": ""
+      },
+      {
+        "name": "automation:calendars:read",
+        "comment": ""
+      },
+      {
+        "name": "automation:calendars:write",
+        "comment": ""
       }
     ]
   }

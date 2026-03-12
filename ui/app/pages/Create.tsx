@@ -16,11 +16,11 @@ type Host = ResultRecord & {
   settingsObjectId?: string
 }
 
-interface BusinessHours {
-  hosts: Array<Host>,
+type BusinessHours = {
+  hosts: Array<Host>
   schedule: {
-    startTime: Number,
-    endTime: Number,
+    startTime: Number
+    endTime: Number
     cadence: string
   }
 }
@@ -62,7 +62,7 @@ const result: QueryResult = {
         }
     ],
     "metadata": {}
-  }
+}
 
 const BusinessHoursWorkflow = () => {
   const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
@@ -140,7 +140,6 @@ const CreateBusinessHours = ({ selectedRows, hostListData }) => {
   const { execute } = useCreateDocument()
 
   useEffect(() => {
-    console.log("doing stuff!")
     execute({
       body: {
         name: hostListData.name,
@@ -171,45 +170,45 @@ const BusinessHoursForm = ({ onSubmit }) => {
   }
 
   return (<>
-      <form onSubmit={(event) => handleSubmit(event)}>
-        <Flex gap={8} paddingTop={12} flexFlow="wrap">
-          <Text>Select time and frequency</Text>
-          <Text>Disable between</Text>
-            <FormField>
-              <DateTimePicker type="time" precision="minutes" value={startTime} onChange={(time) => setStartTime(time!["value"])}></DateTimePicker> - <DateTimePicker type="time" precision="minutes" value={endTime} onChange={(time) => setEndTime(time!["value"])}></DateTimePicker>
-            </FormField>
-          <Text>On a schedule of</Text>
-        </Flex>
-        <Select name="cadence-select" value={cadence} onChange={setCadence}>
-          <Select.Content>
-            <Select.Option value="daily">Daily</Select.Option>
-            <Select.Option value="weekly">Weekly</Select.Option>
-          </Select.Content>
-        </Select>
-        <Text>Host list name</Text>
-        <FormField>
-          <TextInput placeholder="Host list name" value={name} onChange={(text) => setName(text)}></TextInput>
-        </FormField>
-        <Button color="primary" variant="emphasized" type="submit">Create new managed host list</Button>
-      </form>
-    </>)
+    <form onSubmit={(event) => handleSubmit(event)}>
+      <Flex gap={8} paddingTop={12} flexFlow="wrap">
+        <Text>Select time and frequency</Text>
+        <Text>Disable between</Text>
+          <FormField>
+            <DateTimePicker type="time" precision="minutes" value={startTime} onChange={(time) => setStartTime(time!["value"])}></DateTimePicker> - <DateTimePicker type="time" precision="minutes" value={endTime} onChange={(time) => setEndTime(time!["value"])}></DateTimePicker>
+          </FormField>
+        <Text>On a schedule of</Text>
+      </Flex>
+      <Select name="cadence-select" value={cadence} onChange={setCadence}>
+        <Select.Content>
+          <Select.Option value="daily">Daily</Select.Option>
+          <Select.Option value="weekly">Weekly</Select.Option>
+        </Select.Content>
+      </Select>
+      <Text>Host list name</Text>
+      <FormField>
+        <TextInput placeholder="Host list name" value={name} onChange={(text) => setName(text)}></TextInput>
+      </FormField>
+      <Button color="primary" variant="emphasized" type="submit">Create new managed host list</Button>
+    </form>
+  </>)
 }
 
 
 const HostList = ({ rowSelectionListener }) => {
-    return(
-        <Flex flexDirection="column" alignItems="normal" padding={2}>
-            {result && (
-                <DataTable selectableRows onRowSelectionChange={rowSelectionListener} data={result.records} columns={convertToColumns(result.types)} fullWidth></DataTable>
-            )}
-        </Flex>
-    )
+  return(
+      <Flex flexDirection="column" alignItems="normal" padding={2}>
+          {result && (
+              <DataTable selectableRows onRowSelectionChange={rowSelectionListener} data={result.records} columns={convertToColumns(result.types)} fullWidth></DataTable>
+          )}
+      </Flex>
+  )
 }
 
 export const Create = () => {
 
-    return(<>
-        <Heading>Select hosts and their business schedule</Heading>
-        <BusinessHoursWorkflow></BusinessHoursWorkflow>
-    </>)
+  return(<>
+      <Heading>Select hosts and their business schedule</Heading>
+      <BusinessHoursWorkflow></BusinessHoursWorkflow>
+  </>)
 }
