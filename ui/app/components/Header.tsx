@@ -12,9 +12,6 @@ export const Header = () => {
         <AppHeader.NavItem as={Link} to="/create">
           <Button color="neutral" variant="emphasized"><Button.Prefix><PlusIcon></PlusIcon></Button.Prefix>New host list</Button>
         </AppHeader.NavItem>
-        <AppHeader.NavItem as={Link} to="/scheduler">
-          Scheduler
-        </AppHeader.NavItem>
       </AppHeader.NavItems>
     </AppHeader>
   );

@@ -18,7 +18,8 @@
     "sourceMap": true,
     "strictNullChecks": true,
     "target": "ESNext",
-    "typeRoots": ["./node_modules/@types", "./node_modules/@dynatrace"]
+    "typeRoots": ["./node_modules/@types", "./node_modules/@dynatrace"],
+    "resolveJsonModule": true
   },
   "exclude": ["node_modules", "dist", "actions"]
 }

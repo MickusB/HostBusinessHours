@@ -7,7 +7,8 @@ import { Button, Flex, Heading, List, Paragraph, Text } from "@dynatrace/strato-
 import type { QueryResult, ResultRecord } from '@dynatrace-sdk/client-query';
 import { FormField, DateTimePicker, Select, TextInput, DateTimePickerProps } from "@dynatrace/strato-components-preview";
 import { useCreateDocument } from "@dynatrace-sdk/react-hooks";
-import DocumentService from "../services/DocumentService"
+import APIService from "../services/APIService"
+import workflowTemplate from "../../assets/workflow/template.json"
 
 // Type here is functionally the same as a result record, just with one extra property.
 type Host = ResultRecord & {
@@ -22,7 +23,18 @@ type BusinessHours = {
     startTime: Number
     endTime: Number
     cadence: string
-  }
+  },
+  workflowId?: string
+  status?: "Healthy" | "Unhealthy" | "Disabled"
+}
+
+type WorkflowInput = {
+  schedule: {
+    startTime: Number
+    endTime: Number,
+    cadence: string
+  },
+  objectIds: []
 }
 
 const result: QueryResult = {
@@ -135,10 +147,11 @@ const CreateBusinessHours = ({ selectedRows, hostListData }) => {
   }
 
   // Use this to get live data
-  //const settingsObjects = DocumentService.getSettings({ schemaIds: "builtin:host.monitoring", fields: "objectId,scope", scope: hostNames}).then(object => console.log(object))
+  //const settingsObjects = APIService.getSettings({ schemaIds: "builtin:host.monitoring", fields: "objectId,scope", scope: hostNames}).then(object => console.log(object))
 
   const { execute } = useCreateDocument()
 
+  //const objectIds = settingsObjects.items.map(item => item.objectId)
   useEffect(() => {
     execute({
       body: {
@@ -149,8 +162,10 @@ const CreateBusinessHours = ({ selectedRows, hostListData }) => {
         })
       }
     })
+    APIService.createWorkflow(workflowTemplate)
   }, [])
     
+
   return (
       <>
 
