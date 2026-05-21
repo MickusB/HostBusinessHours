@@ -6,9 +6,10 @@ import type { TimeValue } from '@dynatrace/strato-components-preview/core';
 import { Button, Flex, Heading, List, Paragraph, Text } from "@dynatrace/strato-components";
 import type { QueryResult, ResultRecord } from '@dynatrace-sdk/client-query';
 import { FormField, DateTimePicker, Select, TextInput, DateTimePickerProps } from "@dynatrace/strato-components-preview";
-import { useCreateDocument } from "@dynatrace-sdk/react-hooks";
+import { useCreateDocument, useDql } from "@dynatrace-sdk/react-hooks";
 import APIService from "../services/APIService"
 import workflowTemplate from "../../assets/workflow/template.json"
+import { useCreateBusinessHours } from "../hooks/useCreateBusinessHours"
 
 // Type here is functionally the same as a result record, just with one extra property.
 type Host = ResultRecord & {
@@ -20,8 +21,8 @@ type Host = ResultRecord & {
 type BusinessHours = {
   hosts: Array<Host>
   schedule: {
-    startTime: Number
-    endTime: Number
+    start: number
+    end: number
     cadence: string
   },
   workflowId?: string
@@ -30,14 +31,14 @@ type BusinessHours = {
 
 type WorkflowInput = {
   schedule: {
-    startTime: Number
-    endTime: Number,
+    start: number
+    end: number,
     cadence: string
   },
   objectIds: []
 }
 
-const result: QueryResult = {
+/*const result: QueryResult = {
     "records": [
         {
             "entity.name": "Sample Host",
@@ -74,31 +75,35 @@ const result: QueryResult = {
         }
     ],
     "metadata": {}
-}
+}*/
 
 const BusinessHoursWorkflow = () => {
   const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
   const [isCreating, setIsCreating] = useState(false)
   const [hostListData, setHostListData] = useState()
 
+  const result = useDql({
+    query: GET_ALL_HOSTS
+  })
+
   return (
     <>
-      <HostList rowSelectionListener={setSelectedRows}></HostList>
+      <HostList rowSelectionListener={setSelectedRows} result={result}></HostList>
       <BusinessHoursForm onSubmit={(data) => {
         setHostListData(data)
         setIsCreating(true)
       }}>
       </BusinessHoursForm>
-        {isCreating && (
-            <CreateBusinessHours selectedRows={selectedRows} hostListData={hostListData}></CreateBusinessHours>
-        )}
+      {isCreating && (
+        <CreateBusinessHours selectedRows={selectedRows} hostListData={hostListData} result={result}></CreateBusinessHours>
+      )}
     </>
   )
 }
 
-const CreateBusinessHours = ({ selectedRows, hostListData }) => {
+const CreateBusinessHours = ({ selectedRows, hostListData, result }) => {
   //mocked sample response from get settings API
-  const settingsObjects = {
+  /*const settingsObjects = {
     "items": [
         {
           "objectId": "vu9U3hXa3q0AAAAAAAAAdidWlsdGluOmhvc3QubW9uaXRvcmluZwAESE9TVAAQMTZGQUVFOEU3QkY5OUQxMwAkNTJiZWNlNzItMDJiOC0zOWE1LWI0NzctM2MxOWNiZDEzZjk1vu9U3hXa3q0",
@@ -116,60 +121,18 @@ const CreateBusinessHours = ({ selectedRows, hostListData }) => {
     ],
     "totalCount": 3,
     "pageSize": 100
-  }
-  // Map each object ID to its scope
-  const settingsMapping = new Map(settingsObjects.items.map(setting => [setting.scope, setting.objectId]))
+  }*/
 
-  // Keys of selectedRows are stored as strings, so need to convert
-  const selectedIndices = Object.keys(selectedRows).map(index => parseInt(index))
+  const {createBusinessHours, isLoading, error} = useCreateBusinessHours({selectedRows, hostListData, result})
 
-  // Results are stored in ResultRecord object. Settings object ID needs to be added to this record, so intersectional host
-  // type is used here to map ResultRecord to Host
-  let hosts = selectedIndices.map(index => { return result.records[index] as Host})
-
-  // Formats host names to correct format for "scope" parameter of getSettings later
-  const hostNames = hosts.map(host => { return host["entity.name"] }).join(", ")
-
-  // Overwrite hosts with a copy of itself but with the corresponding object ID added to each host
-  hosts = hosts.map(host => ({
-      ...host,
-      settingsObjectId: settingsMapping.get(host.id)
-    })
-  )
-
-  const contentToCreate: BusinessHours = {
-    hosts: hosts,
-    schedule: {
-      startTime: hostListData.startTime,
-      endTime: hostListData.endTime,
-      cadence: hostListData.cadence
-    }
-  }
-
-  // Use this to get live data
-  //const settingsObjects = APIService.getSettings({ schemaIds: "builtin:host.monitoring", fields: "objectId,scope", scope: hostNames}).then(object => console.log(object))
-
-  const { execute } = useCreateDocument()
-
-  //const objectIds = settingsObjects.items.map(item => item.objectId)
   useEffect(() => {
-    execute({
-      body: {
-        name: hostListData.name,
-        type: "managedHostList",
-        content: new Blob([JSON.stringify(contentToCreate)], {
-          type: 'application/json'
-        })
-      }
-    })
-    APIService.createWorkflow(workflowTemplate)
+    createBusinessHours()
   }, [])
-    
 
   return (
-      <>
+    <>
 
-      </>
+    </>
   )
 }
 
@@ -179,7 +142,7 @@ const BusinessHoursForm = ({ onSubmit }) => {
   const [cadence, setCadence] = useState<"daily" | "weekly">()
   const [name, setName] = useState("")
 
-  const handleSubmit = (event) => { 
+  const handleSubmit = (event) => {
     event.preventDefault()
     onSubmit({ startTime, endTime, cadence, name })
   }
@@ -189,9 +152,9 @@ const BusinessHoursForm = ({ onSubmit }) => {
       <Flex gap={8} paddingTop={12} flexFlow="wrap">
         <Text>Select time and frequency</Text>
         <Text>Disable between</Text>
-          <FormField>
-            <DateTimePicker type="time" precision="minutes" value={startTime} onChange={(time) => setStartTime(time!["value"])}></DateTimePicker> - <DateTimePicker type="time" precision="minutes" value={endTime} onChange={(time) => setEndTime(time!["value"])}></DateTimePicker>
-          </FormField>
+        <FormField>
+          <DateTimePicker type="time" precision="minutes" value={startTime} onChange={(time) => setStartTime(time!["value"])}></DateTimePicker> - <DateTimePicker type="time" precision="minutes" value={endTime} onChange={(time) => setEndTime(time!["value"])}></DateTimePicker>
+        </FormField>
         <Text>On a schedule of</Text>
       </Flex>
       <Select name="cadence-select" value={cadence} onChange={setCadence}>
@@ -210,20 +173,21 @@ const BusinessHoursForm = ({ onSubmit }) => {
 }
 
 
-const HostList = ({ rowSelectionListener }) => {
-  return(
-      <Flex flexDirection="column" alignItems="normal" padding={2}>
-          {result && (
-              <DataTable selectableRows onRowSelectionChange={rowSelectionListener} data={result.records} columns={convertToColumns(result.types)} fullWidth></DataTable>
-          )}
-      </Flex>
+const HostList = ({ rowSelectionListener, result }) => {
+  return (
+    <Flex flexDirection="column" alignItems="normal" padding={2}>
+      {result.data && (
+        <DataTable selectableRows onRowSelectionChange={rowSelectionListener} data={result.data.records} columns={convertToColumns(result.data.types)} fullWidth></DataTable>
+      )}
+    </Flex>
   )
 }
 
 export const Create = () => {
-
-  return(<>
+  return (
+    <>
       <Heading>Select hosts and their business schedule</Heading>
       <BusinessHoursWorkflow></BusinessHoursWorkflow>
-  </>)
+    </>
+  )
 }

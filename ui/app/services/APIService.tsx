@@ -6,7 +6,7 @@ const getSettings = async (config) => await settingsObjectsClient.getSettingsObj
 const updateSettingsByObject = async (config) => await settingsObjectsClient.putSettingsObjectByObjectId(config)
 
 const createWorkflow = async (config) => await workflowsClient.createWorkflow({
-    body: config 
+    body: config
   },
 );
 
