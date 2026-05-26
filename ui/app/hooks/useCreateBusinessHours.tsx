@@ -32,15 +32,8 @@ export const useCreateBusinessHours = ({ selectedRows, hostListData, result }) =
 
     const createBusinessHours = async () => {
         try {
-            // Results are stored in ResultRecord object. Settings object ID needs to be added to this record, so intersectional host
-            // type is used here to map ResultRecord to Host
-
-            // Formats host names to correct format for "scope" parameter of getSettings later
-
             // Use this to get live data
-            console.log(hostNames)
             const settingsObjects = await APIService.getSettings({ schemaIds: "builtin:host.monitoring", fields: "objectId,scope", scope: hostNames })
-            console.log(settingsObjects)
             // Map each object ID to its scope
             const settingsMapping = new Map(settingsObjects.items.map(setting => [setting.scope, setting.objectId]))
 
